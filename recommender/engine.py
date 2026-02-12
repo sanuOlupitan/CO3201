@@ -24,18 +24,33 @@ def load_model():
 #loads the models immediatey when django starts
 tfidf_matrix, indices, movie_data = load_model()
 
-def get_recommendations(title):
+def get_recommendations(query):
     #Safety Check: has model been trained?
     if tfidf_matrix is None or indices is None:
         return ["ERROR: Model not trained. Run 'python manage.py train_model' first."]
     
-    #check if the movie exists inour database
-    #use 'indices' to find matrix location 
-    try:
-        idx = indices[title]
-    except KeyError:
-        return [] #when movie not found
+    #finds the best matching title
+    #convert everything to lowercase to make search case insensitive 
+    query = query.lower().strip()
+
+    #this gets all movies titles from the trained data
+    all_titles = indices.index
+
+    # new search logic
+    # First, look for an exact match
+    match = next((t for t in all_titles if t.lower() == query), None)
+
+    #if no exact match, look for a partial match
+    if not match:
+        match = next((t for t in all_titles if query in t.lower()), None)
+
+    #if theres still no match, give up
+    if not match:
+        return []
     
+    #get index of the found movie
+    idx = indices[match]
+
     #compute Similarity
     #only calculate the similarity for this specific move against the pre-calculated matrix
     cosine_sim = linear_kernel(tfidf_matrix[idx:idx+1], tfidf_matrix)
