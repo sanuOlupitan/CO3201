@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+        <title>Netflix Recommender</title>
+        <link rel="stylesheet" href="{% static 'recommender/style.css' %}">
+    </head>
+    <body>
+        <div class="container">
+            <h1>NETFLIX RECOMMENDER</h1>
+
+            <div class="search-box">
+                <form method="GET" action="" style="display: flex; width: 100%; justify-content: center;">
+                    <input type="text" name="q" placeholder="Enter a movie title" value="{{ search_query|default:'' }}">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+
+            {% if search_query %}
+                <h2 class="results-header">Results for "{{ search_query }}"</h2>
+
+                {% if recommendations %}
+                    <div class="movie-grid">
+                        {% for movie in recommendations %}
+                        <div class="movie-card">
+                            <div>
+                                <div class="card-title">{{ movie.title }}</div>
+                                <div class="card-meta">
+                                    <span>{{ movie.release_year }}</span>
+                                    <span style="color: #e50914; font-weight: bold;">{{ movie.type }}</span>
+                                </div>
+                                <p class="card-desc">{{ movie.description }}</p>
+                            </div>
+
+                            <div class="badges">
+                                <span class="badge">{{ movie.rating }}</span>
+                                <span class="badge">{{ movie.duration }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <p>No recommendations found. Try checking the spelling!</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+            
+        </div>
+    </body>
+</html>
